@@ -50,10 +50,9 @@ public class MinecartRemover extends JavaPlugin {
         }
         return false;
     }
-
-    public static boolean isInBorder(Location center, Location notCenter, int range) {
+    public static boolean isInBorder(Location center, Location border, int range) {
         int x = center.getBlockX(), z = center.getBlockZ();
-        int x1 = notCenter.getBlockX(), z1 = notCenter.getBlockZ();
+        int x1 = border.getBlockX(), z1 = border.getBlockZ();
         if (x1 >= (x + range) || z1 >= (z + range) || x1 <= (x - range) || z1 <= (z - range)) {
             return false;
         }
