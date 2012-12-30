@@ -1,8 +1,11 @@
 main: name.brychta.minecartremover.MinecartRemover
 name: MinecartRemover
-version: 0.1
+version: 0.2
 author: Martin Brychta aka SirPole, [CZE]
 commands:
     rmmc:
         description: Removes empty, useless minecarts.
-        usage: "/<command> range"
+permissions:
+    minecraftremover.rmmc:
+        description: Gives access to /rmmc command
+        default: op
