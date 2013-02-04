@@ -1,0 +1,10 @@
+#define which types should be removed, options:
+#    regular - removes only regular minecarts
+#    furnace - removes regular AND furnace minecarts
+#    storage - removes regular AND storage minecarts
+#    all     - removes every minecart
+remove: regular
+
+#true - ONLY empty carts will be removed
+#false - removes also occupied and/or filled minecarts (if specified above)
+empty_only: true
