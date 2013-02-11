@@ -1,10 +1,23 @@
 #define which types should be removed, options:
-#    regular - removes only regular minecarts
-#    furnace - removes regular AND furnace minecarts
+#    regular - removes only regular minecarts (default)
+#    furnace - removes regular AND not moving furnace minecarts
 #    storage - removes regular AND storage minecarts
 #    all     - removes every minecart
 remove: regular
 
-#true - ONLY empty carts will be removed
+#true - ONLY empty carts will be removed (default)
 #false - removes also occupied and/or filled minecarts (if specified above)
 empty_only: true
+
+#====================================================================================================
+#This is part of my school project, you're free to use it if you want.
+
+#This enables/disables home feature, check the plugin page for more information
+#true - enabled
+#false - disabled (default)
+home: false
+
+#This enables/disables spawn feature, check the plugin page for more information
+#true - enabled
+#false - disabled (default)
+spawn: false

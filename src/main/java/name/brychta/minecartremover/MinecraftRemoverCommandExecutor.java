@@ -11,40 +11,71 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.PoweredMinecart;
 import org.bukkit.entity.StorageMinecart;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.util.Vector;
-
+//@author Martin Brychta [SirPole]
 class MinecraftRemoverCommandExecutor implements CommandExecutor {
 
     private MinecartRemover plg;
-    private int i = 0, j = 0, k = 0;
+    private int i = 0, j = 0, k = 0; //using for counting Minecarts
 
     public MinecraftRemoverCommandExecutor(MinecartRemover plg) {
         this.plg = plg;
     }
 
+    /*
+     * Applies command /rmmc <range> [selection] [emptiness]
+     * Removes minecarts in range
+     * @param cs Command Sender, in this case must be player
+     * @param cmd Command itself
+     * @param str Command Alias, I'm not using that
+     * @param args Arguments, 1. argument is required - range, 2.-3. arguments are optional, they serve as config override
+     * @return true if successful
+     */
+    @Override
     public boolean onCommand(CommandSender cs, Command cmd, String str, String[] args) {
+        String selection = plg.getConfig().getString("remove");
+        boolean emptiness = plg.getConfig().getBoolean("empty_only");
+        int range = 0;
         if (cmd.getName().equalsIgnoreCase("rmmc")) {
             if (cs instanceof Player) {
                 Player player = (Player) cs;
                 if (player.hasPermission("minecartremover.rmmc")) {
-                    if (args.length == 1) {
-                        int range = (int) Double.parseDouble(args[0]);
-                        Location loc = player.getLocation();
-                        for (Entity entity : loc.getWorld().getEntities()) {
-                            if (isInRange(loc, entity.getLocation(), range)) {
-                                Remove(entity, plg.getConfig().getString("remove"), plg.getConfig().getBoolean("empty_only"));
+                    switch (args.length) {
+                        case 0:
+                            cs.sendMessage(ChatColor.RED + "Not enough arguments - /rmmc <range> [regular | furnace | storage | all] [empty | NOTempty]");
+                            return false;
+                        case 1:
+                            range = Integer.parseInt(args[0]);
+                            break;
+                        case 2:
+                            range = Integer.parseInt(args[0]);
+                            selection = args[1];
+                            break;
+                        case 3:
+                            range = Integer.parseInt(args[0]);
+                            selection = args[1];
+                            if ("empty".equals(args[2])) {
+                                emptiness = true;
+                            } else if ("NOTempty".contains(args[2])) {
+                                emptiness = false;
                             }
-                        }
-                        if (i == -1 && j == -1 && k == -1) {
-                            cs.sendMessage(ChatColor.RED + "[Minecart Remover] Invalid selection, check your config.yml");
-                        } else {
-                            cs.sendMessage(ChatColor.GREEN + "[Minecart Remover] " + i + " Regular, " + k + " Storage and " + j + " Furnace Minecart(s) cleared.");
-                        }
-                        i = j = k = 0;
-                        return true;
-                    } else {
-                        cs.sendMessage(ChatColor.RED + "[Minecart Remover] Wrong amount of arguments, usage: /rmmc [range]");
+                            break;
+                        default:
+                            cs.sendMessage(ChatColor.RED + "Too many arguments - /rmmc <range> [regular | furnace | storage | all] [empty | NOTempty]");
+                            return false;
                     }
+                    Location loc = player.getLocation();
+                    for (Entity entity : loc.getWorld().getEntities()) {
+                        if (isInRange(loc, entity.getLocation(), range)) {
+                            Remove(entity, selection, emptiness);
+                        }
+                    }
+                    if (i == -1 && j == -1 && k == -1) {
+                        cs.sendMessage(ChatColor.RED + "[Minecart Remover] Invalid selection, check your config.yml or parameters of typed command");
+                    } else {
+                        cs.sendMessage(ChatColor.GREEN + "[Minecart Remover] " + i + " Regular, " + k + " Storage and " + j + " Furnace Minecart(s) cleared.");
+                    }
+                    i = j = k = 0;
+                    return true;
                 } else {
                     cs.sendMessage(ChatColor.RED + "[Minecart Remover] You don't have necessary permission 'minecartremover.rmmc'");
                 }
@@ -55,6 +86,13 @@ class MinecraftRemoverCommandExecutor implements CommandExecutor {
         return false;
     }
 
+    /*
+     * Gets every entity in specified range
+     * @param center Location, where player is
+     * @param border Location, where range is at top
+     * @param range range
+     * @return true if entity found
+     */
     public static boolean isInRange(Location center, Location border, int range) {
         int x = center.getBlockX(), z = center.getBlockZ();
         int x1 = border.getBlockX(), z1 = border.getBlockZ();
@@ -64,8 +102,15 @@ class MinecraftRemoverCommandExecutor implements CommandExecutor {
         return true;
     }
 
-    public void Remove(Entity entity, String selection, boolean empty) {
-        if (empty) {
+    /*
+     * Removes 1 minecart due to selecion
+     * @param entity entity given by isInRange method
+     * @param selection selection made, by config or overriden
+     * @param emptiness if empty or not
+     * @return nothing, but might return true, if successful
+     */
+    public void Remove(Entity entity, String selection, boolean emptiness) {
+        if (emptiness) {
             switch (selection) {
                 case "regular":
                     if ((entity instanceof Minecart) && !(entity instanceof StorageMinecart || entity instanceof PoweredMinecart)) {
