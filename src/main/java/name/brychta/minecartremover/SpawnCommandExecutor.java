@@ -1,7 +1,6 @@
 package name.brychta.minecartremover;
 
 import org.bukkit.ChatColor;
-import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -27,24 +26,21 @@ public class SpawnCommandExecutor implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender cs, Command cmd, String str, String[] args) {
         if (cmd.getName().equalsIgnoreCase("spawn")) {
-            if (plg.getConfig().getBoolean("spawn")) {
-                if (cs instanceof Player) {
-                    Player player = (Player) cs;
-                    if (player.hasPermission("minecartremover.spawn")) {
-                        if (args.length == 0) {
-                            Location loc = player.getWorld().getSpawnLocation();
-                            player.teleport(loc);
-                            player.sendMessage(ChatColor.GREEN + "Whoosh!");
-                            return true;
-                        } else {
-                            cs.sendMessage(ChatColor.RED + "[Minecart Remover] NO arguments are allowed, usage: /spawn");
-                        }
+            if (cs instanceof Player) {
+                Player player = (Player) cs;
+                if (player.hasPermission("minecartremover.spawn")) {
+                    if (args.length == 0) {
+                        player.teleport(player.getWorld().getSpawnLocation());
+                        player.sendMessage(ChatColor.GREEN + "Whoosh!");
+                        return true;
                     } else {
-                        cs.sendMessage(ChatColor.RED + "[Minecart Remover] You don't have necessary permission 'minecartremover.spawn'");
+                        cs.sendMessage(ChatColor.RED + "[Minecart Remover] NO arguments are allowed, usage: /spawn");
                     }
                 } else {
-                    cs.sendMessage(ChatColor.RED + "[Minecart Remover] Not usable from console");
+                    cs.sendMessage(ChatColor.RED + "[Minecart Remover] You don't have necessary permission 'minecartremover.spawn'");
                 }
+            } else {
+                cs.sendMessage(ChatColor.RED + "[Minecart Remover] Not usable from console");
             }
         }
         return false;

@@ -87,11 +87,11 @@ class MinecraftRemoverCommandExecutor implements CommandExecutor {
     }
 
     /*
-     * Gets every entity in specified range
+     * Says if given entity is in range
      * @param center Location, where player is
      * @param border Location, where range is at top
      * @param range range
-     * @return true if entity found
+     * @return true if entity in range
      */
     public static boolean isInRange(Location center, Location border, int range) {
         int x = center.getBlockX(), z = center.getBlockZ();

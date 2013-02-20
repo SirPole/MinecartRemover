@@ -28,27 +28,25 @@ public class SethomeCommandExecutor implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender cs, Command cmd, String str, String[] args) {
         if (cmd.getName().equalsIgnoreCase("sethome")) {
-            if (plg.getConfig().getBoolean("home")) {
-                if (cs instanceof Player) {
-                    Player player = (Player) cs;
-                    if (player.hasPermission("minecartremover.sethome")) {
-                        if (args.length == 0) {
-                            Location loc = player.getLocation();
-                            int x = (int) loc.getX();
-                            int y = (int) loc.getY();
-                            int z = (int) loc.getZ();
-                            player.setBedSpawnLocation(loc, true);
-                            cs.sendMessage(ChatColor.GREEN + "Your home has been set to X=" + x + ", Y=" + y + ", Z=" + z + ".");
-                            return true;
-                        } else {
-                            cs.sendMessage(ChatColor.RED + "[Minecart Remover] NO arguments are allowed, usage: /sethome");
-                        }
+            if (cs instanceof Player) {
+                Player player = (Player) cs;
+                if (player.hasPermission("minecartremover.sethome")) {
+                    if (args.length == 0) {
+                        Location loc = player.getLocation();
+                        int x = (int) loc.getX();
+                        int y = (int) loc.getY();
+                        int z = (int) loc.getZ();
+                        player.setBedSpawnLocation(loc, true);
+                        cs.sendMessage(ChatColor.GREEN + "Your home has been set to X=" + x + ", Y=" + y + ", Z=" + z + ".");
+                        return true;
                     } else {
-                        cs.sendMessage(ChatColor.RED + "[Minecart Remover] You don't have necessary permission 'minecartremover.sethome'");
+                        cs.sendMessage(ChatColor.RED + "[Minecart Remover] NO arguments are allowed, usage: /sethome");
                     }
                 } else {
-                    cs.sendMessage(ChatColor.RED + "[Minecart Remover] Not usable from console");
+                    cs.sendMessage(ChatColor.RED + "[Minecart Remover] You don't have necessary permission 'minecartremover.sethome'");
                 }
+            } else {
+                cs.sendMessage(ChatColor.RED + "[Minecart Remover] Not usable from console");
             }
         }
         return false;

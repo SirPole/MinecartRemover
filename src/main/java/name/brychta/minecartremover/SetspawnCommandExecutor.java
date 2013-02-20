@@ -28,27 +28,25 @@ public class SetspawnCommandExecutor implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender cs, Command cmd, String str, String[] args) {
         if (cmd.getName().equalsIgnoreCase("setspawn")) {
-            if (plg.getConfig().getBoolean("spawn")) {
-                if (cs instanceof Player) {
-                    Player player = (Player) cs;
-                    if (player.hasPermission("minecartremover.setspawn")) {
-                        if (args.length == 0) {
-                            Location loc = player.getLocation();
-                            int x = (int) loc.getX();
-                            int y = (int) loc.getY();
-                            int z = (int) loc.getZ();
-                            loc.getWorld().setSpawnLocation(x, y, z);
-                            cs.sendMessage(ChatColor.GREEN + "Global spawn has been set to X=" + x + ", Y=" + y + ", Z=" + z + ".");
-                            return true;
-                        } else {
-                            cs.sendMessage(ChatColor.RED + "[Minecart Remover] NO arguments are allowed, usage: /setspawn");
-                        }
+            if (cs instanceof Player) {
+                Player player = (Player) cs;
+                if (player.hasPermission("minecartremover.setspawn")) {
+                    if (args.length == 0) {
+                        Location loc = player.getLocation();
+                        int x = (int) loc.getX();
+                        int y = (int) loc.getY();
+                        int z = (int) loc.getZ();
+                        loc.getWorld().setSpawnLocation(x, y, z);
+                        cs.sendMessage(ChatColor.GREEN + "Global spawn has been set to X=" + x + ", Y=" + y + ", Z=" + z + ".");
+                        return true;
                     } else {
-                        cs.sendMessage(ChatColor.RED + "[Minecart Remover] You don't have necessary permission 'minecartremover.setspawn'");
+                        cs.sendMessage(ChatColor.RED + "[Minecart Remover] NO arguments are allowed, usage: /setspawn");
                     }
                 } else {
-                    cs.sendMessage(ChatColor.RED + "[Minecart Remover] Not usable from console");
+                    cs.sendMessage(ChatColor.RED + "[Minecart Remover] You don't have necessary permission 'minecartremover.setspawn'");
                 }
+            } else {
+                cs.sendMessage(ChatColor.RED + "[Minecart Remover] Not usable from console");
             }
         }
         return false;

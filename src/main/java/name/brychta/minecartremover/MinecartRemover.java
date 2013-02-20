@@ -10,10 +10,14 @@ public class MinecartRemover extends JavaPlugin {
     public void onEnable() {
         this.saveDefaultConfig();
         getCommand("rmmc").setExecutor(new MinecraftRemoverCommandExecutor(this));
-        getCommand("home").setExecutor(new HomeCommandExecutor(this));
-        getCommand("spawn").setExecutor(new SpawnCommandExecutor(this));
-        getCommand("setspawn").setExecutor(new SetspawnCommandExecutor(this));
-        getCommand("sethome").setExecutor(new SethomeCommandExecutor(this));
+        if (this.getConfig().getBoolean("home")) {
+            getCommand("home").setExecutor(new HomeCommandExecutor(this));
+            getCommand("spawn").setExecutor(new SpawnCommandExecutor(this));
+        }
+        if (this.getConfig().getBoolean("spawn")) {
+            getCommand("setspawn").setExecutor(new SetspawnCommandExecutor(this));
+            getCommand("sethome").setExecutor(new SethomeCommandExecutor(this));
+        }
     }
 
     /*
