@@ -1,7 +1,6 @@
 package name.brychta.minecartremover;
 
 import org.bukkit.ChatColor;
-import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -32,13 +31,23 @@ public class SethomeCommandExecutor implements CommandExecutor {
                 Player player = (Player) cs;
                 if (player.hasPermission("minecartremover.sethome")) {
                     if (args.length == 0) {
-                        Location loc = player.getLocation();
-                        int x = (int) loc.getX();
-                        int y = (int) loc.getY();
-                        int z = (int) loc.getZ();
-                        player.setBedSpawnLocation(loc, true);
-                        cs.sendMessage(ChatColor.GREEN + "Your home has been set to X=" + x + ", Y=" + y + ", Z=" + z + ".");
-                        return true;
+                        if (plg.setHome(player.getName(), player)) {
+                            cs.sendMessage(ChatColor.GREEN + "[Minecart Remover] Your home has been set.");
+                            return true;
+                        } else {
+                            cs.sendMessage(ChatColor.RED + "[Minecart Remover] Something went wrong, check log...");
+                        }
+                    } else if (args.length == 1) {
+                        if (player.hasPermission("minecartremover.sethome.other")) {
+                            if (plg.setHome(args[0], player)) {
+                                cs.sendMessage(ChatColor.GREEN + "[Minecart Remover] " + args[0] + "'s home has been set.");
+                                return true;
+                            } else {
+                                cs.sendMessage(ChatColor.RED + "[Minecart Remover] Something went wrong, check log...");
+                            }
+                        } else {
+                            cs.sendMessage(ChatColor.RED + "[Minecart Remover] You don't have necessary permission 'minecartremover.sethome.other'");
+                        }
                     } else {
                         cs.sendMessage(ChatColor.RED + "[Minecart Remover] NO arguments are allowed, usage: /sethome");
                     }

@@ -41,7 +41,7 @@ class MinecraftRemoverCommandExecutor implements CommandExecutor {
                 if (player.hasPermission("minecartremover.rmmc")) {
                     switch (args.length) {
                         case 0:
-                            cs.sendMessage(ChatColor.RED + "Not enough arguments - /rmmc <range> [regular | furnace | storage | all] [empty | NOTempty]");
+                            cs.sendMessage(ChatColor.RED + "[Minecart Remover] Not enough arguments - /rmmc <range> [regular | furnace | storage | all] [empty | NOTempty]");
                             return false;
                         case 1:
                             range = Integer.parseInt(args[0]);
@@ -60,7 +60,7 @@ class MinecraftRemoverCommandExecutor implements CommandExecutor {
                             }
                             break;
                         default:
-                            cs.sendMessage(ChatColor.RED + "Too many arguments - /rmmc <range> [regular | furnace | storage | all] [empty | NOTempty]");
+                            cs.sendMessage(ChatColor.RED + "[Minecart Remover] Too many arguments - /rmmc <range> [regular | furnace | storage | all] [empty | NOTempty]");
                             return false;
                     }
                     Location loc = player.getLocation();

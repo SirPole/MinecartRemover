@@ -5,6 +5,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.event.player.PlayerTeleportEvent;
 //@author Martin Brychta [SirPole]
 public class HomeCommandExecutor implements CommandExecutor {
 
@@ -30,11 +31,27 @@ public class HomeCommandExecutor implements CommandExecutor {
                 Player player = (Player) cs;
                 if (player.hasPermission("minecartremover.home")) {
                     if (args.length == 0) {
-                        player.teleport(player.getBedSpawnLocation());
-                        cs.sendMessage(ChatColor.GREEN + "Whoosh!");
-                        return true;
+                        if (plg.getHome(player.getName()) != null) {
+                            player.teleport(plg.getHome(player.getName()), PlayerTeleportEvent.TeleportCause.PLUGIN);
+                            cs.sendMessage(ChatColor.GREEN + "Whoosh!");
+                            return true;
+                        } else {
+                            cs.sendMessage(ChatColor.RED + "[Minecart Remover] Set your home somewhere first using /sethome.");
+                        }
+                    } else if (args.length == 1) {
+                        if (player.hasPermission("minecartremover.home.other")) {
+                            if (plg.getHome(args[0]) != null) {
+                                player.teleport(plg.getHome(args[0]), PlayerTeleportEvent.TeleportCause.PLUGIN);
+                                cs.sendMessage(ChatColor.GREEN + "Whoosh!");
+                                return true;
+                            } else {
+                                cs.sendMessage(ChatColor.RED + "[Minecart Remover] Oops, seems like " + args[0] + " doesn't have home yet...");
+                            }
+                        } else {
+                            cs.sendMessage(ChatColor.RED + "[Minecart Remover] You don't have necessary permission 'minecartremover.home.other'");
+                        }
                     } else {
-                        cs.sendMessage(ChatColor.RED + "[Minecart Remover] NO arguments are allowed, usage: /home");
+                        cs.sendMessage(ChatColor.RED + "[Minecart Remover] Too many arguments, usage: /home or /home [target]");
                     }
                 } else {
                     cs.sendMessage(ChatColor.RED + "[Minecart Remover] You don't have necessary permission 'minecartremover.home'");

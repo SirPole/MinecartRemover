@@ -4,7 +4,7 @@
 
   <groupId>name.brychta</groupId>
   <artifactId>MinecartRemover</artifactId>
-  <version>0.4</version>
+  <version>0.5</version>
   <packaging>jar</packaging>
 
   <name>MinecartRemover</name>
@@ -31,6 +31,11 @@
       <groupId>Bukkit</groupId>
       <artifactId>Bukkit</artifactId>
       <version>1.4.7_R1.0</version>
+    </dependency>
+    <dependency>
+      <groupId>SQLite</groupId>
+      <artifactId>SQLite</artifactId>
+      <version>3.7.2</version>
     </dependency>
   </dependencies>
 </project>

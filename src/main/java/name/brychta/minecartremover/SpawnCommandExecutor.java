@@ -5,6 +5,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.event.player.PlayerTeleportEvent;
 //@author Martin Brychta [SirPole]
 public class SpawnCommandExecutor implements CommandExecutor {
 
@@ -30,11 +31,25 @@ public class SpawnCommandExecutor implements CommandExecutor {
                 Player player = (Player) cs;
                 if (player.hasPermission("minecartremover.spawn")) {
                     if (args.length == 0) {
-                        player.teleport(player.getWorld().getSpawnLocation());
-                        player.sendMessage(ChatColor.GREEN + "Whoosh!");
-                        return true;
+                        if (plg.getSpawn(player.getWorld().getName()) != null) {
+                            player.teleport(plg.getSpawn(player.getWorld().getName()), PlayerTeleportEvent.TeleportCause.PLUGIN);
+                            player.sendMessage(ChatColor.GREEN + "Whoosh!");
+                            return true;
+                        }
+                    } else if (args.length == 1) {
+                        if (player.hasPermission("minecartremover.spawn.other")) {
+                            if (plg.getSpawn(args[0]) != null) {
+                                player.teleport(plg.getSpawn(args[0]), PlayerTeleportEvent.TeleportCause.PLUGIN);
+                                player.sendMessage(ChatColor.GREEN + "Whoosh!");
+                                return true;
+                            } else {
+                                cs.sendMessage(ChatColor.RED + "[Minecart Remover] Oops, seems like the world doesn't exists...");
+                            }
+                        } else {
+                            cs.sendMessage(ChatColor.RED + "[Minecart Remover] You don't have necessary permission 'minecartremover.spawn.other'");
+                        }
                     } else {
-                        cs.sendMessage(ChatColor.RED + "[Minecart Remover] NO arguments are allowed, usage: /spawn");
+                        cs.sendMessage(ChatColor.RED + "[Minecart Remover] NO arguments are allowed, usage: /spawn or /spawn [world]");
                     }
                 } else {
                     cs.sendMessage(ChatColor.RED + "[Minecart Remover] You don't have necessary permission 'minecartremover.spawn'");

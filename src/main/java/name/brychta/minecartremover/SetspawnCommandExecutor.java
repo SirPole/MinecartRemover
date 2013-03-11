@@ -1,5 +1,7 @@
 package name.brychta.minecartremover;
 
+import java.sql.SQLException;
+import java.sql.Statement;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.command.Command;
@@ -10,9 +12,12 @@ import org.bukkit.entity.Player;
 public class SetspawnCommandExecutor implements CommandExecutor {
 
     private MinecartRemover plg;
+    private static SQL sql;
+    private Statement st;
 
     public SetspawnCommandExecutor(MinecartRemover plg) {
         this.plg = plg;
+        sql = new SQL(plg);
     }
 
     /*
@@ -32,13 +37,12 @@ public class SetspawnCommandExecutor implements CommandExecutor {
                 Player player = (Player) cs;
                 if (player.hasPermission("minecartremover.setspawn")) {
                     if (args.length == 0) {
-                        Location loc = player.getLocation();
-                        int x = (int) loc.getX();
-                        int y = (int) loc.getY();
-                        int z = (int) loc.getZ();
-                        loc.getWorld().setSpawnLocation(x, y, z);
-                        cs.sendMessage(ChatColor.GREEN + "Global spawn has been set to X=" + x + ", Y=" + y + ", Z=" + z + ".");
-                        return true;
+                        if (plg.setSpawn(player)) {
+                            cs.sendMessage(ChatColor.GREEN + "[Minecart Remover] Global spawn has been set.");
+                            return true;
+                        } else {
+                            cs.sendMessage(ChatColor.RED + "[Minecart Remover] Something went wrong, check log...");
+                        }
                     } else {
                         cs.sendMessage(ChatColor.RED + "[Minecart Remover] NO arguments are allowed, usage: /setspawn");
                     }
