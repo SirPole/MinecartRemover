@@ -7,7 +7,7 @@
 #   spawner   - removes spawner minecarts
 #   all       - removes every minecart
 #If you want to specifiy more options, use ',' operand like so: rideable,explosive,spawner
-remove: regular
+remove: rideable
 
 #true - ONLY empty carts will be removed (default)
 #false - removes also occupied and/or filled minecarts (if specified above)
