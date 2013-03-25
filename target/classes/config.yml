@@ -1,23 +1,14 @@
 #define which types should be removed, options:
-#    regular - removes only regular minecarts (default)
-#    furnace - removes regular AND not moving furnace minecarts
-#    storage - removes regular AND storage minecarts
-#    all     - removes every minecart
+#   rideable  - removes only rideable minecarts (default)
+#   furnace   - removes furnace minecarts
+#   storage   - removes storage minecarts
+#   hopper    - removes hopper minecarts
+#   explosive - removes explosive minecarts
+#   spawner   - removes spawner minecarts
+#   all       - removes every minecart
+#If you want to specifiy more options, use ',' operand like so: rideable,explosive,spawner
 remove: regular
 
 #true - ONLY empty carts will be removed (default)
 #false - removes also occupied and/or filled minecarts (if specified above)
 empty_only: true
-
-#====================================================================================================
-#This is part of my school project, you're free to use it if you want.
-
-#This enables/disables home feature, check the plugin page for more information
-#true - enabled
-#false - disabled (default)
-home: false
-
-#This enables/disables spawn feature, check the plugin page for more information
-#true - enabled
-#false - disabled (default)
-spawn: false

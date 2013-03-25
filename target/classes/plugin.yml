@@ -1,41 +1,11 @@
 main: name.brychta.minecartremover.MinecartRemover
 name: MinecartRemover
-version: 0.5
+version: 0.6
 author: Martin Brychta aka SirPole, [CZE]
-database: true
 commands:
     rmmc:
         description: Removes empty, useless(Now ANY) minecarts.
-    home:
-        description: Teleports player to his home.
-    sethome:
-        description: Sets location player is at as home.
-    spawn:
-        description: Teleports player to global spawnpotion
-    setspawn:
-        description: Sets location player is at as global spawnpoint.
 permissions:
     minecartremover.rmmc:
         description: Gives access to /rmmc command
-        default: op
-    minecartremover.home:
-        description: Gives access to /home command
-        default: true
-    minecartremover.home.other:
-        description: Gives access to /home <target> command
-        defualt: op
-    minecartremover.sethome:
-        description: Gives access to /sethome command
-        default: true
-    minecartremover.sethome.other:
-        description: Gives access to /sethome <target> command
-        default: op
-    minecartremover.spawn:
-        description: Gives access to /spawn command
-        default: true
-    minecartremover.spawn.other:
-        description: Gives access to /spawn <world> command
-        default: op
-    minecartremover.setspawn:
-        description: Gives access to /setspawn command
         default: op

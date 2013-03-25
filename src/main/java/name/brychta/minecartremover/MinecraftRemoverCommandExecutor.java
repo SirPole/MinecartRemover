@@ -8,17 +8,20 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Minecart;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.PoweredMinecart;
-import org.bukkit.entity.StorageMinecart;
+import org.bukkit.entity.minecart.*;
 import org.bukkit.inventory.ItemStack;
 //@author Martin Brychta [SirPole]
 class MinecraftRemoverCommandExecutor implements CommandExecutor {
 
     private MinecartRemover plg;
-    private int i = 0, j = 0, k = 0; //using for counting Minecarts
+    private int i = 0; //using for counting Minecarts
+    String selection;
+    boolean emptiness;
 
     public MinecraftRemoverCommandExecutor(MinecartRemover plg) {
         this.plg = plg;
+        selection = plg.getConfig().getString("remove");
+        emptiness = plg.getConfig().getBoolean("empty_only");
     }
 
     /*
@@ -32,8 +35,6 @@ class MinecraftRemoverCommandExecutor implements CommandExecutor {
      */
     @Override
     public boolean onCommand(CommandSender cs, Command cmd, String str, String[] args) {
-        String selection = plg.getConfig().getString("remove");
-        boolean emptiness = plg.getConfig().getBoolean("empty_only");
         int range = 0;
         if (cmd.getName().equalsIgnoreCase("rmmc")) {
             if (cs instanceof Player) {
@@ -41,18 +42,20 @@ class MinecraftRemoverCommandExecutor implements CommandExecutor {
                 if (player.hasPermission("minecartremover.rmmc")) {
                     switch (args.length) {
                         case 0:
-                            cs.sendMessage(ChatColor.RED + "[Minecart Remover] Not enough arguments - /rmmc <range> [regular | furnace | storage | all] [empty | NOTempty]");
+                            cs.sendMessage(ChatColor.RED + "[Minecart Remover] Not enough arguments - /rmmc <range> [regular | furnace | storage | hopper | explosive | spawner | all] [empty | NOTempty]");
                             return false;
                         case 1:
                             range = Integer.parseInt(args[0]);
                             break;
                         case 2:
                             range = Integer.parseInt(args[0]);
-                            selection = args[1];
                             break;
                         case 3:
                             range = Integer.parseInt(args[0]);
                             selection = args[1];
+                            if ("all".equals(selection)) {
+                                selection = "regular,furnace,storage,hopper,explosive,spawner";
+                            }
                             if ("empty".equals(args[2])) {
                                 emptiness = true;
                             } else if ("NOTempty".contains(args[2])) {
@@ -66,15 +69,17 @@ class MinecraftRemoverCommandExecutor implements CommandExecutor {
                     Location loc = player.getLocation();
                     for (Entity entity : loc.getWorld().getEntities()) {
                         if (isInRange(loc, entity.getLocation(), range)) {
-                            Remove(entity, selection, emptiness);
+                            if (entity instanceof Minecart) {
+                                Remove(entity);
+                            }
                         }
                     }
-                    if (i == -1 && j == -1 && k == -1) {
+                    if (i == -1) {
                         cs.sendMessage(ChatColor.RED + "[Minecart Remover] Invalid selection, check your config.yml or parameters of typed command");
                     } else {
-                        cs.sendMessage(ChatColor.GREEN + "[Minecart Remover] " + i + " Regular, " + k + " Storage and " + j + " Furnace Minecart(s) cleared.");
+                        cs.sendMessage(ChatColor.GREEN + "[Minecart Remover] " + i + " Minecart(s) cleared.");
                     }
-                    i = j = k = 0;
+                    i = 0;
                     return true;
                 } else {
                     cs.sendMessage(ChatColor.RED + "[Minecart Remover] You don't have necessary permission 'minecartremover.rmmc'");
@@ -102,6 +107,78 @@ class MinecraftRemoverCommandExecutor implements CommandExecutor {
         return true;
     }
 
+    public void removeRideable(Entity entity, boolean emptiness) {
+        if (emptiness) {
+            if (entity.isEmpty()) {
+                entity.remove();
+            }
+        } else {
+            entity.remove();
+        }
+        i++;
+    }
+
+    public void removeFurnace(Entity entity, boolean emptiness) {
+        if (emptiness) {
+            if (entity.getVelocity().length() == 0) {
+                entity.remove();
+            }
+        } else {
+            entity.remove();
+        }
+        i++;
+    }
+
+    public void removeStorage(Entity entity, boolean emptiness) {
+        if (emptiness) {
+            StorageMinecart stmc = (StorageMinecart) entity;
+            boolean emptycart = true;
+            ItemStack[] contents = stmc.getInventory().getContents();
+            for (ItemStack item : contents) {
+                if (item != null) {
+                    emptycart = false;
+                    break;
+                }
+            }
+            if (emptycart) {
+                entity.remove();
+            }
+        } else {
+            entity.remove();
+        }
+        i++;
+    }
+
+    public void removeExplosive(Entity entity) {
+        entity.remove();
+        i++;
+    }
+
+    public void removeHopper(Entity entity, boolean emptiness) {
+        if (emptiness) {
+            HopperMinecart homc = (HopperMinecart) entity;
+            boolean emptycart = true;
+            ItemStack[] contents = homc.getInventory().getContents();
+            for (ItemStack item : contents) {
+                if (item != null) {
+                    emptycart = false;
+                    break;
+                }
+            }
+            if (emptycart) {
+                entity.remove();
+            }
+        } else {
+            entity.remove();
+        }
+        i++;
+    }
+
+    public void removeSpawner(Entity entity) {
+        entity.remove();
+        i++;
+    }
+
     /*
      * Removes 1 minecart due to selecion
      * @param entity entity given by isInRange method
@@ -109,120 +186,42 @@ class MinecraftRemoverCommandExecutor implements CommandExecutor {
      * @param emptiness if empty or not
      * @return nothing, but might return true, if successful
      */
-    public void Remove(Entity entity, String selection, boolean emptiness) {
-        if (emptiness) {
-            switch (selection) {
-                case "regular":
-                    if ((entity instanceof Minecart) && !(entity instanceof StorageMinecart || entity instanceof PoweredMinecart)) {
-                        if (entity.isEmpty()) {
-                            entity.remove();
-                            i++;
-                        }
+    public void Remove(Entity entity) {
+        String[] list = selection.split(",");
+        for (String sel : list) {
+            switch (sel) {
+                case "rideable":
+                    if (entity instanceof RideableMinecart) {
+                        removeRideable(entity, emptiness);
                     }
                     break;
                 case "furnace":
                     if (entity instanceof PoweredMinecart) {
-                        if (entity.getVelocity().length() == 0) {
-                            entity.remove();
-                            j++;
-                        }
-                    } else if ((entity instanceof Minecart) && !(entity instanceof StorageMinecart)) {
-                        if (entity.isEmpty()) {
-                            entity.remove();
-                            i++;
-                        }
+                        removeFurnace(entity, emptiness);
                     }
                     break;
                 case "storage":
                     if (entity instanceof StorageMinecart) {
-                        StorageMinecart stmc = (StorageMinecart) entity;
-                        boolean emptycart = true;
-                        ItemStack[] contents = stmc.getInventory().getContents();
-                        for (ItemStack item : contents) {
-                            if (item != null) {
-                                emptycart = false;
-                            }
-                        }
-                        if (emptycart) {
-                            entity.remove();
-                            k++;
-                        }
-                    } else if ((entity instanceof Minecart) && !(entity instanceof PoweredMinecart)) {
-                        if (entity.isEmpty()) {
-                            entity.remove();
-                            i++;
-                        }
+                        removeStorage(entity, emptiness);
                     }
                     break;
-                case "all":
-                    if (entity instanceof StorageMinecart) {
-                        StorageMinecart stmc = (StorageMinecart) entity;
-                        boolean emptycart = true;
-                        ItemStack[] contents = stmc.getInventory().getContents();
-                        for (ItemStack item : contents) {
-                            if (item != null) {
-                                emptycart = false;
-                            }
-                        }
-                        if (emptycart) {
-                            entity.remove();
-                            k++;
-                        }
-                    } else if (entity instanceof PoweredMinecart) {
-                        if (entity.getVelocity().length() == 0) {
-                            entity.remove();
-                            j++;
-                        }
-                    } else if (entity instanceof Minecart) {
-                        if (entity.isEmpty()) {
-                            entity.remove();
-                            i++;
-                        }
+                case "hopper":
+                    if (entity instanceof HopperMinecart) {
+                        removeHopper(entity, emptiness);
+                    }
+                    break;
+                case "explosive":
+                    if (entity instanceof ExplosiveMinecart) {
+                        removeExplosive(entity);
+                    }
+                    break;
+                case "spawner":
+                    if (entity instanceof SpawnerMinecart) {
+                        removeSpawner(entity);
                     }
                     break;
                 default:
-                    i = j = k = -1;
-            }
-        } else {
-            switch (selection) {
-                case "regular":
-                    if ((entity instanceof Minecart) && !(entity instanceof StorageMinecart || entity instanceof PoweredMinecart)) {
-                        entity.remove();
-                        i++;
-                    }
-                    break;
-                case "furnace":
-                    if (entity instanceof PoweredMinecart) {
-                        entity.remove();
-                        j++;
-                    } else if ((entity instanceof Minecart) && !(entity instanceof StorageMinecart)) {
-                        entity.remove();
-                        i++;
-                    }
-                    break;
-                case "storage":
-                    if (entity instanceof StorageMinecart) {
-                        entity.remove();
-                        k++;
-                    } else if ((entity instanceof Minecart) && !(entity instanceof PoweredMinecart)) {
-                        entity.remove();
-                        i++;
-                    }
-                    break;
-                case "all":
-                    if (entity instanceof StorageMinecart) {
-                        entity.remove();
-                        k++;
-                    } else if (entity instanceof PoweredMinecart) {
-                        entity.remove();
-                        j++;
-                    } else if (entity instanceof Minecart) {
-                        entity.remove();
-                        i++;
-                    }
-                    break;
-                default:
-                    i = j = k = -1;
+                    i = -1;
             }
         }
     }
