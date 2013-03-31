@@ -2,6 +2,8 @@ package name.brychta.minecartremover;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.block.Block;
+import org.bukkit.block.Chest;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -9,16 +11,17 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Minecart;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.minecart.*;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 //@author Martin Brychta [SirPole]
-class MinecraftRemoverCommandExecutor implements CommandExecutor {
+class RmmcCommandExecutor implements CommandExecutor {
 
     private MinecartRemover plg;
     private int i = 0; //using for counting Minecarts
-    String selection;
-    boolean emptiness;
+    private String selection;
+    private boolean emptiness;
 
-    public MinecraftRemoverCommandExecutor(MinecartRemover plg) {
+    public RmmcCommandExecutor(MinecartRemover plg) {
         this.plg = plg;
         selection = plg.getConfig().getString("remove");
         emptiness = plg.getConfig().getBoolean("empty_only");
@@ -35,7 +38,7 @@ class MinecraftRemoverCommandExecutor implements CommandExecutor {
      */
     @Override
     public boolean onCommand(CommandSender cs, Command cmd, String str, String[] args) {
-        int range = 0;
+        int range;
         if (cmd.getName().equalsIgnoreCase("rmmc")) {
             if (cs instanceof Player) {
                 Player player = (Player) cs;
@@ -49,6 +52,10 @@ class MinecraftRemoverCommandExecutor implements CommandExecutor {
                             break;
                         case 2:
                             range = Integer.parseInt(args[0]);
+                            selection = args[1];
+                            if ("all".equals(selection)) {
+                                selection = "regular,furnace,storage,hopper,explosive,spawner";
+                            }
                             break;
                         case 3:
                             range = Integer.parseInt(args[0]);
@@ -75,7 +82,7 @@ class MinecraftRemoverCommandExecutor implements CommandExecutor {
                         }
                     }
                     if (i == -1) {
-                        cs.sendMessage(ChatColor.RED + "[Minecart Remover] Invalid selection, check your config.yml or parameters of typed command");
+                        cs.sendMessage(ChatColor.RED + "[Minecart Remover] Invalid selection, check your config.yml or parameters typed.");
                     } else {
                         cs.sendMessage(ChatColor.GREEN + "[Minecart Remover] " + i + " Minecart(s) cleared.");
                     }
@@ -109,73 +116,65 @@ class MinecraftRemoverCommandExecutor implements CommandExecutor {
 
     public void removeRideable(Entity entity, boolean emptiness) {
         if (emptiness) {
-            if (entity.isEmpty()) {
-                entity.remove();
+            if (!entity.isEmpty()) {
+                return;
             }
-        } else {
-            entity.remove();
         }
+        entity.remove();
+        save(328);
         i++;
     }
 
     public void removeFurnace(Entity entity, boolean emptiness) {
         if (emptiness) {
-            if (entity.getVelocity().length() == 0) {
-                entity.remove();
+            if (entity.getVelocity().length() != 0) {
+                return;
             }
-        } else {
-            entity.remove();
         }
+        entity.remove();
+        save(343);
         i++;
     }
 
     public void removeStorage(Entity entity, boolean emptiness) {
         if (emptiness) {
             StorageMinecart stmc = (StorageMinecart) entity;
-            boolean emptycart = true;
             ItemStack[] contents = stmc.getInventory().getContents();
             for (ItemStack item : contents) {
                 if (item != null) {
-                    emptycart = false;
-                    break;
+                    return;
                 }
             }
-            if (emptycart) {
-                entity.remove();
-            }
-        } else {
-            entity.remove();
         }
+        entity.remove();
+        save(342);
         i++;
     }
 
     public void removeExplosive(Entity entity) {
         entity.remove();
+        save(407);
         i++;
     }
 
     public void removeHopper(Entity entity, boolean emptiness) {
         if (emptiness) {
             HopperMinecart homc = (HopperMinecart) entity;
-            boolean emptycart = true;
             ItemStack[] contents = homc.getInventory().getContents();
             for (ItemStack item : contents) {
                 if (item != null) {
-                    emptycart = false;
-                    break;
+                    return;
                 }
             }
-            if (emptycart) {
-                entity.remove();
-            }
-        } else {
-            entity.remove();
         }
+        entity.remove();
+        save(408);
         i++;
     }
 
     public void removeSpawner(Entity entity) {
         entity.remove();
+        save(328);
         i++;
     }
 
@@ -222,6 +221,20 @@ class MinecraftRemoverCommandExecutor implements CommandExecutor {
                     break;
                 default:
                     i = -1;
+            }
+        }
+    }
+
+    public void save(int id) {
+        Block block = plg.getServer().getWorld(plg.getConfig().getString("chestworld")).getBlockAt(plg.getConfig().getInt("chestx"), plg.getConfig().getInt("chesty"), plg.getConfig().getInt("chestz"));
+        if (block instanceof Chest) {
+            Chest chest = (Chest) block;
+            Inventory inv = chest.getInventory();
+            ItemStack add = new ItemStack(id, 1);
+            for (ItemStack item : inv.getContents()) {
+                if (item.getTypeId() == id || item == null) {
+                    inv.addItem(add);
+                }
             }
         }
     }

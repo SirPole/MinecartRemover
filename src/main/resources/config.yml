@@ -12,3 +12,8 @@ remove: rideable
 #true - ONLY empty carts will be removed (default)
 #false - removes also occupied and/or filled minecarts (if specified above)
 empty_only: true
+
+chestx: 0
+chesty: 0
+chestz: 0
+chestworld: world

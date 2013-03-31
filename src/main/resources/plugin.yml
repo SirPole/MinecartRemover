@@ -1,11 +1,22 @@
 main: name.brychta.minecartremover.MinecartRemover
 name: MinecartRemover
-version: 0.6
+version: 0.7
 author: Martin Brychta aka SirPole, [CZE]
 commands:
     rmmc:
-        description: Removes empty, useless(Now ANY) minecarts.
+        description: Removes empty minecars specified.
+    rmmcchest:
+        description: Selects chest as storage for removed carts. Has to be underneath the player.
+    rmmcconfig:
+        description: Edits one line in config.
 permissions:
     minecartremover.rmmc:
         description: Gives access to /rmmc command
         default: op
+    minecartremover.rmmcchest:
+        description: Gives access to /rmmcchest command
+        default: op
+    minecartremover.rmmcconfig:
+        description: Gives access to /rmmcconfig command
+        default: op
+    
